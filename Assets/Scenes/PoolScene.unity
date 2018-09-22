@@ -465,7 +465,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 665968037}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.915, y: 0.208, z: 0}
+  m_LocalPosition: {x: 0, y: 0.208, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1202293859}
@@ -507,6 +507,10 @@ MonoBehaviour:
   PoolMask:
     serializedVersion: 2
     m_Bits: 1024
+  HitPointEditor: {x: 0, y: 0, z: 0}
+  LineRenderer0: {x: 0, y: 0, z: 0}
+  LineRenderer1: {x: 0, y: 0, z: 0}
+  LineRenderer2: {x: 0, y: 0, z: 0}
 --- !u!1 &966168827
 GameObject:
   m_ObjectHideFlags: 0

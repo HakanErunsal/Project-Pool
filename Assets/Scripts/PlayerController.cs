@@ -25,6 +25,9 @@ public class PlayerController : MonoBehaviour {
     private Vector3 LastCameraForward;
     private List<Vector3> LastBallPositions;
 
+    public Vector3 HitPointEditor;
+    public Vector3 LineRenderer0, LineRenderer1, LineRenderer2;
+
     void Start()
     {
         CanPlay = true;
@@ -71,8 +74,16 @@ public class PlayerController : MonoBehaviour {
 
                     LineRnd.SetPosition(1, Ray_.direction * Hit.distance);
                     Vector3 BounceDirection = Vector3.Reflect(Ray_.direction, Hit.normal);
-                    Debug.DrawLine(Hit.point, Hit.point + (BounceDirection * 5f));
-                    LineRnd.SetPosition(2, Hit.point + (BounceDirection.normalized * 5f));
+                    Debug.DrawLine(Hit.point, Hit.point + (BounceDirection * 2f));
+                    Vector3 BouncedPosition = Hit.point + (BounceDirection * 2f);
+                    LineRnd.SetPosition(2, BouncedPosition - Balls[0].transform.position);
+
+                    HitPointEditor = Balls[0].transform.position;
+                    LineRenderer0 = LineRnd.GetPosition(0);
+                    LineRenderer1 = LineRnd.GetPosition(1);
+                    LineRenderer2 = LineRnd.GetPosition(2);
+
+
                 }
                 else
                 {
