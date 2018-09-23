@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
 
     private CameraController CameraCtrl;
 
@@ -11,7 +12,6 @@ public class PlayerController : MonoBehaviour {
 
     public GameObject Line;
     private LineRenderer LineRnd;
-    private Transform GoTransform;
     public LayerMask PoolMask;
 
     private bool CanPlay;
@@ -25,19 +25,18 @@ public class PlayerController : MonoBehaviour {
     private Vector3 LastCameraForward;
     private List<Vector3> LastBallPositions;
 
-    public Vector3 HitPointEditor;
-    public Vector3 LineRenderer0, LineRenderer1, LineRenderer2;
+    private int Score;
+    private bool Ball1Hit, Ball2Hit;
+    private bool ScoreLock;
 
     void Start()
     {
         CanPlay = true;
-        MaxHitSpeed = 500f;
+        MaxHitSpeed = 100f;
 
         CameraCtrl = transform.GetComponent<CameraController>();
         LineRnd = Line.GetComponent<LineRenderer>();
         LastBallPositions = new List<Vector3>();
-
-        GoTransform = Balls[0].transform;
     }
 
     void Update()
@@ -64,30 +63,22 @@ public class PlayerController : MonoBehaviour {
             if (Input.GetKey("space"))
             {
                 //Hit speed lerp to maximum
-                HitSpeed = Mathf.Lerp(HitSpeed, MaxHitSpeed, 0.1f);
+                HitSpeed = Mathf.Lerp(HitSpeed, MaxHitSpeed, 0.01f);
+                float RaySpeed = HitSpeed / 20f;
 
                 //Line trace for aim assist
                 RaycastHit Hit;
 
-                if (Physics.Raycast(Ray_, out Hit, Mathf.Infinity, PoolMask))
+                if (Physics.Raycast(Ray_, out Hit, RaySpeed, PoolMask))
                 {
-
                     LineRnd.SetPosition(1, Ray_.direction * Hit.distance);
                     Vector3 BounceDirection = Vector3.Reflect(Ray_.direction, Hit.normal);
-                    Debug.DrawLine(Hit.point, Hit.point + (BounceDirection * 2f));
-                    Vector3 BouncedPosition = Hit.point + (BounceDirection * 2f);
+                    Vector3 BouncedPosition = Hit.point + (BounceDirection * Mathf.Clamp((RaySpeed - (Hit.point - Balls[0].transform.position).magnitude), 0f, 2f));
                     LineRnd.SetPosition(2, BouncedPosition - Balls[0].transform.position);
-
-                    HitPointEditor = Balls[0].transform.position;
-                    LineRenderer0 = LineRnd.GetPosition(0);
-                    LineRenderer1 = LineRnd.GetPosition(1);
-                    LineRenderer2 = LineRnd.GetPosition(2);
-
-
                 }
                 else
                 {
-                    LineRnd.SetPosition(1, Vector3.zero);
+                    LineRnd.SetPosition(1, Ray_.direction * RaySpeed);
                     LineRnd.SetPosition(2, LineRnd.GetPosition(1));
                 }
             }
@@ -121,7 +112,7 @@ public class PlayerController : MonoBehaviour {
         ReplayValid = true;
 
         //Hit to rigidbody
-        Balls[0].GetComponent<Rigidbody>().AddForce(Direction * HitSpeed);
+        Balls[0].GetComponent<Rigidbody>().AddForce(Direction * (HitSpeed * 5f));
         HitSpeed = 0f;
 
         //Switch to watch mode
@@ -163,5 +154,24 @@ public class PlayerController : MonoBehaviour {
         CanPlay = true;
         IsWatching = false;
         CameraCtrl.ActivateCamera(false);
+        Ball1Hit = Ball2Hit = ScoreLock = false;
+    }
+
+    public void CollisionHandle(bool BallType)
+    {
+        if (BallType)
+        {
+            Ball1Hit = true;
+        }
+        else
+        {
+            Ball2Hit = true;
+        }
+
+        if (!ScoreLock && (Ball1Hit && Ball2Hit))
+        {
+            Score++;
+            ScoreLock = true;
+        }
     }
 }
