@@ -23,7 +23,7 @@ public class CameraController : MonoBehaviour {
 
     public void ActivateCamera(bool Watch)
     {
-        //Switch camera type
+        //Switch camera type and audio listeners
         if (Watch)
         {
             Offset = BallCamera.transform.position - PlayerBall.transform.position;
@@ -34,6 +34,8 @@ public class CameraController : MonoBehaviour {
         }
 
         WatchCamera.SetActive(Watch);
+        WatchCamera.GetComponent<AudioListener>().enabled = Watch;
         BallCamera.SetActive(!Watch);
+        WatchCamera.GetComponent<AudioListener>().enabled = !Watch;
     }
 }

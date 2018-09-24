@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using System.Text;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,6 +11,9 @@ public class PlayerController : MonoBehaviour
 
     public Camera HitCamera;
     public GameObject[] Balls;
+
+    public Text TimeText;
+    public Text ScoreText;
 
     public GameObject Line;
     private LineRenderer LineRnd;
@@ -26,17 +31,26 @@ public class PlayerController : MonoBehaviour
     private List<Vector3> LastBallPositions;
 
     private int Score;
+    private int HitCount;
+    private int CurrentTime;
     private bool Ball1Hit, Ball2Hit;
     private bool ScoreLock;
+    private bool TimeHandle;
+
+    StringBuilder BuiltString;
 
     void Start()
     {
         CanPlay = true;
-        MaxHitSpeed = 100f;
+        MaxHitSpeed = 50f;
+        CurrentTime = 0;
+        TimeHandle = true;
 
         CameraCtrl = transform.GetComponent<CameraController>();
         LineRnd = Line.GetComponent<LineRenderer>();
         LastBallPositions = new List<Vector3>();
+
+        StartCoroutine(Timer());
     }
 
     void Update()
@@ -64,7 +78,7 @@ public class PlayerController : MonoBehaviour
             {
                 //Hit speed lerp to maximum
                 HitSpeed = Mathf.Lerp(HitSpeed, MaxHitSpeed, 0.01f);
-                float RaySpeed = HitSpeed / 20f;
+                float RaySpeed = HitSpeed / 10f;
 
                 //Line trace for aim assist
                 RaycastHit Hit;
@@ -73,7 +87,7 @@ public class PlayerController : MonoBehaviour
                 {
                     LineRnd.SetPosition(1, Ray_.direction * Hit.distance);
                     Vector3 BounceDirection = Vector3.Reflect(Ray_.direction, Hit.normal);
-                    Vector3 BouncedPosition = Hit.point + (BounceDirection * Mathf.Clamp((RaySpeed - (Hit.point - Balls[0].transform.position).magnitude), 0f, 2f));
+                    Vector3 BouncedPosition = Hit.point + (BounceDirection * Mathf.Clamp((RaySpeed - (Hit.point - Balls[0].transform.position).magnitude), 0f, 0.5f));
                     LineRnd.SetPosition(2, BouncedPosition - Balls[0].transform.position);
                 }
                 else
@@ -172,6 +186,41 @@ public class PlayerController : MonoBehaviour
         {
             Score++;
             ScoreLock = true;
+
+            if (ScoreText)
+            {
+                ScoreText.text = "Score: " + Score.ToString();
+            }
+
+            if (Score >= 1)
+            {
+                EndGame(true);
+            }
         }
+    }
+
+    IEnumerator Timer()
+    {
+        if (TimeHandle)
+        {
+            CurrentTime++;
+            yield return new WaitForSeconds(1f);
+            StartCoroutine(Timer());
+
+            string Minutes = Mathf.Floor(CurrentTime / 60).ToString("00");
+            string Seconds = Mathf.RoundToInt(CurrentTime % 60).ToString("00");
+
+            if (TimeText)
+            {
+                TimeText.text = "Time: " + Minutes + "." + Seconds;
+            }
+        }
+        yield return null;
+    }
+
+    void EndGame(bool Success)
+    {
+        CanPlay = false;
+        TimeHandle = false;
     }
 }
