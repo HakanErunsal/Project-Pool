@@ -11,14 +11,19 @@ public class GameManager : MonoBehaviour {
     private PlayerScore PlayerScore_;
     private string FilePath;
 
-    void Start ()
+    void Start()
     {
         DontDestroyOnLoad(this);
 
         FilePath = Path.Combine(Application.streamingAssetsPath, GameDataFileName);
 
-        LoadGameData();
-	}
+        PlayerScore_ = new PlayerScore();
+        PlayerScore_.Score = 5;
+        PlayerScore_.Time = 10;
+        PlayerScore_.HitCount = 1;
+
+        SaveGameData();
+    }
 
     public void LoadScene()
     {
@@ -58,6 +63,7 @@ public class GameManager : MonoBehaviour {
     public void SaveGameData()
     {
         string DataJson = JsonUtility.ToJson(PlayerScore_);
-        File.WriteAllText(FilePath, DataJson);
+        File.WriteAllText(Application.dataPath + GameDataFileName, DataJson);
+        Debug.Log(Application.dataPath + GameDataFileName);
     }
 }
