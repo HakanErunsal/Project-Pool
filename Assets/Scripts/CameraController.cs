@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour {
     {
         //Save offset and activate the play camera
         Offset = BallCamera.transform.position - PlayerBall.transform.position;
-        ActivateCamera(false);
+        ActivateCamera(false, false);
     }
 
     void Update ()
@@ -21,16 +21,19 @@ public class CameraController : MonoBehaviour {
 
 	}
 
-    public void ActivateCamera(bool Watch)
+    public void ActivateCamera(bool Watch, bool ForReplay)
     {
         //Switch camera type and audio listeners
-        if (Watch)
+        if (!ForReplay)
         {
-            Offset = BallCamera.transform.position - PlayerBall.transform.position;
-        }
-        else
-        {
-            BallCamera.transform.position = PlayerBall.transform.position + Offset;
+            if (Watch)
+            {
+                Offset = BallCamera.transform.position - PlayerBall.transform.position;
+            }
+            else
+            {
+                BallCamera.transform.position = PlayerBall.transform.position + Offset;
+            }
         }
 
         WatchCamera.SetActive(Watch);

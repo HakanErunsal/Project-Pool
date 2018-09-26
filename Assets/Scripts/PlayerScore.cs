@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerScore : MonoBehaviour
+[System.Serializable]
+public class PlayerScore
 {
-    public int Score;
-    public int Time;
-    public int HitCount;
+    public int Score_;
+    public int Time_;
+    public int HitCount_;
 }

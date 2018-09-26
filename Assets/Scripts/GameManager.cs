@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
-    private string GameDataFileName = "GameData.json";
+    public static GameManager GameInstance;
 
-    private PlayerScore PlayerScore_;
-    private string FilePath;
+    public int WinningScore = 5;
 
-    void Start()
+    void Awake()
     {
-        DontDestroyOnLoad(this);
+        if (GameInstance == null)
+            GameInstance = this;
 
-        FilePath = Path.Combine(Application.streamingAssetsPath, GameDataFileName);
+        else if (GameInstance != this)
+            Destroy(gameObject);
 
-        PlayerScore_ = new PlayerScore();
-        PlayerScore_.Score = 5;
-        PlayerScore_.Time = 10;
-        PlayerScore_.HitCount = 1;
-
-        SaveGameData();
+        DontDestroyOnLoad(gameObject);
     }
 
     public void LoadScene()
@@ -35,35 +32,12 @@ public class GameManager : MonoBehaviour {
         {
             SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
         }
-
     }
 
-    public void ChangeVolume(float Value)
-    {
-        AudioListener.volume = Value;
-    }
-
-    public void LoadGameData()
-    {
-        
-
-        if (File.Exists(FilePath))
-        {
-            string DataJson = File.ReadAllText(FilePath);
-
-            PlayerScore PlayerScore_ = JsonUtility.FromJson<PlayerScore>(DataJson);
-        }
-
-        else
-        {
-            Debug.Log("No saved file");
-        }
-    }
-
-    public void SaveGameData()
+    public void SaveGame(PlayerScore PlayerScore_)
     {
         string DataJson = JsonUtility.ToJson(PlayerScore_);
-        File.WriteAllText(Application.dataPath + GameDataFileName, DataJson);
-        Debug.Log(Application.dataPath + GameDataFileName);
+        File.WriteAllText(Application.dataPath + "/StreamingAssets/GameData.json", DataJson);
+        Debug.Log("Game data saved");
     }
 }
